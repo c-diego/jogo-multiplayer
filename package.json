@@ -1,0 +1,21 @@
+{
+  "name": "jogo-multiplayer",
+  "version": "1.0.0",
+  "description": "Jogo multiplayer baseado no jogo do Filipe Deschamps. Este jogo é uma atividade da matéria Padrões de Projeto.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "start": "node index.js"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "c-diego",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0"
+  }
+}
