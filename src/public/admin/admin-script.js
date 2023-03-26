@@ -1,11 +1,15 @@
 let connected = false
-const socket = io();
+const socket = io({
+  query: {
+    admin: true
+  }
+})
 let game
 const scoreTable = document.getElementById('score-table')
 const gameCanvas = document.getElementById('game-canvas')
 let totalPlayersCount = ''
-const collectFruitAudio = new Audio('/collect.mp3')
-const collect100FruitAudio = new Audio('/100-collect.mp3')
+const collectFruitAudio = new Audio('collect.mp3')
+const collect100FruitAudio = new Audio('100-collect.mp3')
 
 socket.on('connect', () => {
   connected = true
@@ -89,14 +93,14 @@ socket.on('fruit-remove', ({ fruitId, score }) => {
   if (multipleOf100Remainder !== 0) {
     collectFruitAudio.pause()
     collectFruitAudio.currentTime = 0
-    collectFruitAudio.play()
+    collectFruitAudio.play().catch(console.log)
   }
 
   if (multipleOf100Remainder === 0 && score !== 0) {
     collectFruitAudio.pause()
     collect100FruitAudio.pause()
     collect100FruitAudio.currentTime = 0
-    collect100FruitAudio.play()
+    collect100FruitAudio.play().catch(console.log)
   }
 
   updateScoreTable()
@@ -125,25 +129,15 @@ socket.on('stop-crazy-mode', () => {
   clearInterval(crazyModeInterval)
 })
 
-socket.on('show-max-concurrent-connections-message', () => {
-  document.getElementById('max-concurrent-connection-message').style.display = 'block'
-  document.getElementById('game-container').style.display = 'none'
-})
-
-socket.on('hide-max-concurrent-connections-message', () => {
-  document.getElementById('max-concurrent-connection-message').style.display = 'none'
-  document.getElementById('game-container').style.display = 'block'
-})
-
 function updateScoreTable() {
   const maxResults = 10
 
   let scoreTableInnerHTML = `
-        <tr class="header">
-            <td>Top 10 Jogadores</td>
-            <td>Pontos</td>
-        </tr>
-    `
+                <tr class="header">
+                    <td>Top 10 Jogadores</td>
+                    <td>Pontos</td>
+                </tr>
+            `
   const scoreArray = []
 
   for (socketId in game.players) {
@@ -168,14 +162,15 @@ function updateScoreTable() {
 
   const scoreSliced = scoreArraySorted.slice(0, maxResults)
 
+
   scoreSliced.forEach((score) => {
 
     scoreTableInnerHTML += `
-            <tr class="${socket.id === score.socketId ? 'current-player' : ''}">
-                <td class="socket-id">${score.socketId}</td>
-                <td class="score-value">${score.score}</td>
-            </tr>
-        `
+                    <tr class="${socket.id === score.socketId ? 'current-player' : ''}">
+                        <td class="socket-id">${score.socketId}</td>
+                        <td class="score-value">${score.score}</td>
+                    </tr>
+                `
   })
 
   let playerNotInTop10 = true
@@ -191,22 +186,21 @@ function updateScoreTable() {
 
   if (playerNotInTop10) {
     scoreTableInnerHTML += `
-            <tr class="current-player bottom">
-                <td class="socket-id">${socket.id}</td>
-                <td class="score-value">${game.players[socket.id].score}</td>
-            </tr>
-        `
+                    <tr class="current-player bottom">
+                        <td class="socket-id">${socket.id}</td>
+                        <td class="score-value">${game.players[socket.id].score}</td>
+                    </tr>
+                `
   }
 
   scoreTableInnerHTML += `
-        <tr class="footer">
-            <td>Total de jogadores</td>
-            <td align="right">${totalPlayersCount}</td>
-        </tr>
-    `
+                <tr class="footer">
+                    <td>Total de jogadores</td>
+                    <td align="right">${totalPlayersCount}</td>
+                </tr>
+            `
 
   scoreTable.innerHTML = scoreTableInnerHTML
-
 
 }
 
@@ -239,8 +233,6 @@ function handleKeydown(event) {
   }
 }
 
-// Essa lógica deveria estar no server.
-// Como está no front, é fácil burlar.
 function throttle(callback, delay) {
   let isThrottled = false, args, context;
 
@@ -266,6 +258,34 @@ function throttle(callback, delay) {
   return wrapper;
 }
 
-const throttledKeydown = throttle(handleKeydown, 80);
+const throttledKeydown = throttle(handleKeydown, 80)
 
-document.addEventListener('keydown', throttledKeydown);
+document.addEventListener('keydown', throttledKeydown)
+
+/* ADMIN */
+function startFruitGame() {
+  const interval = document.getElementById('fruitGameInterval').value
+  console.log(interval)
+  socket.emit('admin-start-fruit-game', interval)
+}
+
+function stopFruitGame() {
+  socket.emit('admin-stop-fruit-game')
+}
+
+function startCrazyMode() {
+  socket.emit('admin-start-crazy-mode')
+}
+
+function stopCrazyMode() {
+  socket.emit('admin-stop-crazy-mode')
+}
+
+function clearScores() {
+  socket.emit('admin-clear-scores')
+}
+
+function setMaxConcurrentConnections() {
+  const maxConcurrentConnections = document.getElementById('maxConcurrentConnections').value
+  socket.emit('admin-concurrent-connections', maxConcurrentConnections)
+}

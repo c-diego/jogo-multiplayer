@@ -1,0 +1,61 @@
+<html>
+
+<head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta charset="utf-8">
+  <title>Meu Primeiro Jogo Multiplayer</title>
+  <link rel="stylesheet" href="admin-style.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+
+  <canvas id="game-canvas"></canvas>
+  <table id="score-table"></table>
+
+  <style>
+    #admin {
+      padding-right: 200px;
+    }
+
+    #admin input,
+    #admin button {
+      width: 120px;
+      height: 30px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+  </style>
+  <div id="admin">
+    <div>
+      <input type="text" value=2000 id="fruitGameInterval"><br>
+      <button type="button" onclick="startFruitGame()">Start Fruits</button><br>
+      <button type="button" onclick="stopFruitGame()">Stop Fruits</button>
+    </div>
+
+    <br>
+    <div>
+      <button type="button" onclick="startCrazyMode()">Start Crazy Mode</button><br>
+      <button type="button" onclick="stopCrazyMode()">Stop Crazy Mode</button><br>
+    </div>
+
+    <br>
+    <div>
+      <button type="button" onclick="clearScores()">Clear Scores</button><br>
+    </div>
+
+    <br>
+    <div>
+      <input type="text" value=15 id="maxConcurrentConnections"><br>
+      <button type="button" onclick="setMaxConcurrentConnections()">Set Concurrent Connections</button><br>
+    </div>
+
+  </div>
+  </div>
+
+  <script src="admin-script.js"></script>
+</body>
+
+</html>
